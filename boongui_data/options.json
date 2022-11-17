@@ -199,6 +199,7 @@
 					{ "value": "yawning.ogg", "label": "yawning" },
 					{ "value": "beep_idle_02.ogg", "label": "beep_idle_02" },
 					{ "value": "we-are-waiting.ogg", "label": "[color=\"220 185 70\"]we-are-waiting.ogg - recommended[/color]" },
+					{ "value": "we-are-waitingTTS.ogg", "label": "[color=\"220 185 70\"]we-are-waitingTTS.ogg[/color]" },
 					{ "value": "we-are-ready-with-it.ogg", "label": "we-are-ready-with-it" },
 					{ "value": "we-did-it-yeah.ogg", "label": "we-did-it-yeah[/color]" },
 					{ "value": "stretches-and-yawns2.ogg", "label": "stretches-and-yawns2" },
@@ -215,15 +216,42 @@
 					{ "value": "hearAll", "label": "Hear all Players" }
 				]
 			},
+
+		{
+			"type": "boolean",
+			"label": "[color=\"220 185 70\"]yawning: Hear as observer (not implemented)[/color]",
+			"tooltip": "Hear all also as observer (not recomandet)",
+			"config": "boongui.yawningHearAsObserver"
+		},
+
+
 			{
 				"type": "dropdown",
-				"label": "[color=\"220 185 70\"]yawning: count and show all interruptions by Idle[/color]",
+				"label": "[color=\"220 185 70\"]yawning count[/color]: and show all interruptions by Idle(EXPERIMENTAL)",
 				"tooltip": "count and show all interruptions by Idle EXPERIMENTAL shows as error message",
 				"config": "boongui.yawningShowInterruptionsByIdle",
 				"list": [
 					{ "value": "", "label": "no text messages with interruptions statistic" },
 					{ "value": "showAllCount", "label": "show all" }
 				]
+			},
+			{
+				"type": "boolean",
+				"label": "[color=\"220 185 70\"]tips[/color] population gives you tips(EXPERIMENTAL)",
+				"tooltip": "population gives you tips (yellow waring messages  ",
+				"config": "boongui.tipsFromPopulation"
+			},
+			{
+				"type": "boolean",
+				"label": "[color=\"220 185 70\"]tips[/color]itsWorldCup(EXPERIMENTAL)",
+				"tooltip": "itsWorldCup welcome message and greeting voice",
+				"config": "boongui.itsWorldCup"
+			},
+			{
+				"type": "boolean",
+				"label": "[color=\"220 185 70\"]tips[/color]explain easiest hotkey-config for beginners (seeh-hotKeys-config) (EXPERIMENTAL)",
+				"tooltip": "explain hotKeys configuration from seeh",
+				"config": "boongui.hotKeyExplained"
 			}
 		]
 	}

@@ -6,6 +6,29 @@ class BoonGUIStatsTopPanelRow
 	constructor(row, index)
 	{
 		const PREFIX = row.name;
+
+
+		// wometimes saved here ~/.config/0ad/config/user.cfg or eventually sometimes here ~/git/0a26/binaries/data/config/
+		// Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", "hello_world 12", "config/user.cfg");
+		// Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", "hello speak this 13", "config/user.cfg");
+        // Engine.ConfigDB_CreateValue("TTS", "AudioTTS.speak", "test me 14");
+		// Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", "hello speak this 15", "config/user.cfg");
+        // Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", "what is this", "config/tts.cfg");
+
+
+		this.hotKeyExplainedTipsList = [ 
+			"Beginners can't remember the hotkeys?",
+			"build Building: Press the first Letter of a Building-Name (or press several times for toggling Buildings).",
+			"Press ALT+FirstLetter of a Creature to select Creature or Creatures",
+			"Press ALT+C to select cavalry",
+			"Press ALT+W to select womens",
+			"Press the letter F to build a farm.",
+			"Press F twice to build a farmstead. For more ask for the seeh-hotkey-config.",
+			""
+			];
+
+
+
 		this.root = Engine.GetGUIObjectByName(PREFIX);
 		this.root.size = BoonGUIGetRowSize(index, 26);
 
@@ -16,6 +39,8 @@ class BoonGUIStatsTopPanelRow
 		this.playerHighlight.onPress = () => focusCC(true, this.state);
 		this.team = Engine.GetGUIObjectByName(`${PREFIX}_team`);
 		this.player = Engine.GetGUIObjectByName(`${PREFIX}_player`);
+		// warn('this.player===' + this.player);
+		// warn(this.player);
 		this.rating = Engine.GetGUIObjectByName(`${PREFIX}_rating`);
 
 		this.civHighlight = Engine.GetGUIObjectByName(`${PREFIX}_civHighlight`);
@@ -35,11 +60,22 @@ class BoonGUIStatsTopPanelRow
 		this.popHighlight = Engine.GetGUIObjectByName(`${PREFIX}_popHighlight`);
 		this.popCount = Engine.GetGUIObjectByName(`${PREFIX}_popCount`);
 		this.popLimit = Engine.GetGUIObjectByName(`${PREFIX}_popLimit`);
+
+		// let idleCount = this.idleWorkerCount.caption.match(/.*\](\d+)\[/)[1];
+
 		this.idleWorkerHighlight = Engine.GetGUIObjectByName(`${PREFIX}_idleWorkerHighlight`);
 		// TODO, in observer mode the idle button is disabled, it shouldn't be.
 
 		this.gameStartTime = new Date();
 
+		this.voiceInfosExtra = { 
+			"popMax" : 0,
+			"isbn" : "344254565X",
+			"autor" : "Pratchet",
+			"pubdate" : "15.8.2005"
+		}
+
+		this.sgMapName = Engine.GetGUIObjectByName("sgMapName"); // dont work
 
 		this.idleWorkerCount = Engine.GetGUIObjectByName(`${PREFIX}_idleWorkerCount`);
 		this.idleWorkerCount_prev = 0;
@@ -55,6 +91,7 @@ class BoonGUIStatsTopPanelRow
 		this.playername_multiplayer = Engine.ConfigDB_GetValue("user", "playername.multiplayer");
 		this.playername_singleplayer = Engine.ConfigDB_GetValue("user", "playername.singleplayer");
 
+		// ANCHOR Engine.ConfigDB_GetValue
 		if( parseInt(Engine.ConfigDB_GetValue("user", "boongui.yawningIdlePopMax")) > 0)
 		{
 			this.yawningIdle = true;
@@ -69,6 +106,10 @@ class BoonGUIStatsTopPanelRow
 		}
 
 		this.statPopCount = 0;
+
+		this.hotKeyExplained_atPopCount = -1;
+
+		this.hotKeyExplained = 0;
 
 		this.resource = {
 			"counts": {},
@@ -106,6 +147,17 @@ class BoonGUIStatsTopPanelRow
 
 		Engine.SetGlobalHotkey("structree", "Press", openStrucTree);
 		Engine.SetGlobalHotkey("civinfo", "Press", openStrucTree);
+
+		// warn("btw messageBox from GameSettingsController~boongui.js works - at line 2");
+		// Engine.GetGUIObjectByName(`${PREFIX}_ecoTechCount`);
+		
+
+        // Engine.ConfigDB_CreateValue("TTS", "AudioTTS.speak", "test me");
+        // Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", "what is this", "config/tts.cfg");
+
+		// playerNameAsObj =  Engine.ConfigDB_GetValue("user", "localratings.save.searchplayerinput"); // works
+
+
 	}
 
 	update(state, scales)
@@ -127,6 +179,8 @@ class BoonGUIStatsTopPanelRow
 		const playerNick = setStringTags(state.nick, { "color": state.playerColor });
 		caption = limitPlayerName(state.nick, 10, 13);
 		this.player.caption = caption;
+		// warn(this.player.caption); // here are only players from teh same team
+		// warn(this.team.caption); in a singe game its alwas team 1 or 2 maybe
 		this.playerHighlight.tooltip = setStringTags(state.name, { "color": state.playerColor });
 		this.playerHighlight.tooltip += state.team != -1 ? setStringTags("\nTeam " + this.team.caption, { "color": state.teamColor }) : "";
 		caption = Engine.IsAtlasRunning() ? "" : `${translateAISettings(g_InitAttributes.settings.PlayerData[state.index])}`;
@@ -437,11 +491,127 @@ class BoonGUIStatsTopPanelRow
 		if (playerNick)
 			try {
 				playerNickShort = playerNick.match(/.*\](\w+)\[/)[1];
-			} catch (error) { }
+			} catch (error) {
+				return
+			 }
 		// if(!playerNickShort) return;
+		// if(Engine.ConfigDB_GetValue("user", "boongui.tipsFromPopulation") == "true")
+		this.itsMe = (playerNickShort == this.playername_multiplayer || playerNickShort == this.playername_singleplayer);
+		// warn("mp=" + this.playername_singleplayer) // its for me x often if i play local.
+		// ANCHOR - idk how to find out if i ovserver or not.
+
+			 // boongui.yawningHearAsObserver
+
+		// warn("this.itsMe=" + this.itsMe)
+		
+		// warn(JSON.stringify(this.itsMe));
+
+			if(this.itsMe && this.voiceInfosExtra.popMax == 1
+				&& this.statPopCount + 50 > this.state.popMax) // this.itsMe && 
+			{
+				this.voiceInfosExtra.popMax++;
+				error("!! popMax = " + this.state.popMax);
+				warn("!! popMax = " + this.state.popMax + " maybe stop training.");
+			}
+
+			this.popLimitInt = this.popLimit.caption.match(/.*\](\d+)\[/)[1];
+			if(this.itsMe && this.statPopCount + 5 > this.popLimitInt 
+				&& this.popLimitIntOD != this.popLimitInt
+				&& Engine.ConfigDB_GetValue("user", "boongui.tipsFromPopulation") == "true"){
+				error("nearly housed. build more housese");
+				this.popLimitIntOD = this.popLimitInt;
+			}
+
+
+			if(this.itsMe == true
+				 && this.hotKeyExplainedTipsList.length > 0
+				 && this.hotKeyExplained_atPopCount != this.statPopCount
+				 && Engine.ConfigDB_GetValue("user", "boongui.hotKeyExplained") == "true"){
+				let msg = this.hotKeyExplainedTipsList.shift();
+				Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+				this.hotKeyExplained_atPopCount = this.statPopCount;
+				this.hotKeyExplained++; // just for statisic or so
+				warn(this.hotKeyExplained);
+			}
+
+			if( this.itsMe !== true && this.voiceInfosExtra.popMax == 0 && Engine.ConfigDB_GetValue("user", "boongui.itsWorldCup") == "true"){
+				this.voiceInfosExtra.popMax = 1 // ++
+
+				// Engine.PlayUISound("audio/0ADworldCupSeptember2022/geralt_0_0.ogg", true);
+
+				const msg = "0AD 1v1 Tournament Oktober 2022. Seeh versus Wave-A-Book .";
+
+				Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+
+
+				// ANCHOR - Tournament: PhiliptheSwaggerless \n vs \nEdwarf
+				// const message = setStringTags("Valihrant \n vs \n thephilosopher \n\n\nfirst round", { "font": "sans-bold-20" });
+				// const message = setStringTags("Edwarf (1861)\n vs\nPhiliptheSwaggerless (1646)  \n\n\nfirst round", { "font": "sans-bold-20" });
+				// const message = setStringTags("ValihrAnt (2322) \n vs\nDakara (1772) \n\n\nsecond round", { "font": "sans-bold-20" });
+				const title = setStringTags("0AD 1v1 Tournament Oktober 2022", { "font": "sans-bold-14" });
+				const message = setStringTags(msg, { "font": "sans-bold-20" });
+				messageBox(300, 200, message, title, ["Ok"], [() => { 
+				 }]);
+				// print('495: print  '); // no error bot noting to see
+				// logmsg('496: logmsg'); not defined
+				// warn('496: warn');
+				// error('495: test');
+			}else{
+				// warn("popMax = " + this.state.popMax);
+				// const playerList = Engine.GetPlayerList();
+				// warn("playerList = " + playerList);
+			}
+
+			if(this.itsMe && this.voiceInfosExtra.popMax == 0
+				&& Engine.ConfigDB_GetValue("user", "boongui.tipsFromPopulation") == "true"){
+				this.voiceInfosExtra.popMax++;
+				// tooltip += "Max" + g_Indent + g_Indent + normalizeValue(state.popMax);
+				// warn("pop = " + this.statPopCount);
+				// error("gameStartTime = " + this.gameStartTime);
+				
+
+				// messageBox(
+				// 	400, 200,
+				// 	"helloo world" + "\n\n" 
+				// );
+
+		
+
+
+				// if(this.state.civ == 'ptol'){
+				// 	warn(this.state.civ + ':range:P1 slingers(30m) archers(60m): Stable(P1), Barack(P2), Hero(P3), 90m/4s:BoltS.(P3), 10/60/75: Towser');
+				// }
+
+
+				if(Engine.ConfigDB_GetValue("user", "boongui.tipsFromPopulation") == "true"){
+
+					error('_____________________________________________________________________________');
+					warn('! be sure you\'re not only playing against Player2 !!!!! its not a player.');
+					warn('! be sure you\'re not only playing against Player2 !!!!! its not a player.');
+					error('_____________________________________________________________________________');
+				}
+
+
+				// let REGEX = /(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})/;
+				// // const results = REGEX.exec('2018-07-12');
+				// const results = REGEX.exec(this.gameStartTime);
+				// warn("month/day = " + results.groups.month + '/' + results.groups.day);  // null
+				
+
+				
+				// let error = new Error("Insufficient arguments to patch: ");
+				// warn(error.message);
+				// warn("test");
+				// warn(error.stack);
+		
+
+
+
+				// this.sgMapPreview.sprite = this.mapCache.getMapPreview(stanza.mapType, stanza.mapName);
+
+			}
 
 		// Engine.ConfigDB_GetValue("user", "boongui.yawningHearAllPlayers")
-		this.itsMe = (playerNickShort == this.playername_multiplayer || playerNickShort == this.playername_singleplayer);
 		let t = new Date();
 		const waitedTime = t - this.lastYawningTime;
 		let idleCount = this.idleWorkerCount.caption.match(/.*\](\d+)\[/)[1];
@@ -470,8 +640,10 @@ class BoonGUIStatsTopPanelRow
 				this.yawningIdleCount++;
 
 				// playerNickShort is empty if observer-mode and nobody selected? 
-				if (playerNickShort && Engine.ConfigDB_GetValue("user", "boongui.yawningShowInterruptionsByIdle") === "showAllCount")
+				if (playerNickShort && Engine.ConfigDB_GetValue("user", "boongui.yawningShowInterruptionsByIdle") === "showAllCount"){
 					error("interruptions by Idle's:" + playerNickShort + "=" + this.yawningIdleCount);
+				}
+					
 				// error(this.gameStartArgs.time);
 				// error(stanza.startTime);
 				// this.gameStartArgs.time =
@@ -480,23 +652,33 @@ class BoonGUIStatsTopPanelRow
 			}
 
 			if (t < this.stopYawningTime) {
+
+
 				let yawningAudioFile = Engine.ConfigDB_GetValue("user", "boongui.yawningAudioFile");
-				if (idleCount > 1)
-					if (idleCount > 9 && yawningAudioFile == "we-did-it-yeah.ogg")
-						Engine.PlayUISound("audio/interface/alarm/" + "we-did-it.ogg", false);
-
+				if (true || yawningAudioFile == "TTS"){
+					if(idleCount == 1)
+						Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", idleCount + " is waiting", "config/user.cfg");
 					else
-						Engine.PlayUISound("audio/interface/alarm/" + yawningAudioFile, false);
-				else {
-					if (yawningAudioFile == "we-are-waiting.ogg")
-						Engine.PlayUISound("audio/interface/alarm/" + "iam-waiting.ogg", false);
-					else if (yawningAudioFile == "we-are-ready-with-it.ogg")
-						Engine.PlayUISound("audio/interface/alarm/i-ready-with-it.ogg", false);
-					else if (yawningAudioFile == "we-did-it-yeah.ogg")
-						Engine.PlayUISound("audio/interface/alarm/i-did-it-yeah.ogg", false);
+						Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", idleCount + " are waiting", "config/user.cfg");
+				}else{
+					if (idleCount > 1)
+						if (idleCount > 9 && yawningAudioFile == "we-did-it-yeah.ogg"){
+							Engine.PlayUISound("audio/interface/alarm/" + "we-did-it.ogg", false);
+						}else
+							Engine.PlayUISound("audio/interface/alarm/" + yawningAudioFile, false);
+					else {
+						if (yawningAudioFile == "we-are-waitingTTS.ogg")
+							Engine.PlayUISound("audio/interface/alarm/" + "iam-waitingTTS.ogg", false);
+						if (yawningAudioFile == "we-are-waiting.ogg")
+							Engine.PlayUISound("audio/interface/alarm/" + "iam-waiting.ogg", false);
+						else if (yawningAudioFile == "we-are-ready-with-it.ogg")
+							Engine.PlayUISound("audio/interface/alarm/i-ready-with-it.ogg", false);
+						else if (yawningAudioFile == "we-did-it-yeah.ogg")
+							Engine.PlayUISound("audio/interface/alarm/i-did-it-yeah.ogg", false);
 
-					else
-						Engine.PlayUISound("audio/interface/alarm/" + yawningAudioFile, false);
+						else
+							Engine.PlayUISound("audio/interface/alarm/" + yawningAudioFile, false);
+					}
 				}
 				this.lastYawningTime = Date.now();
 			} else {

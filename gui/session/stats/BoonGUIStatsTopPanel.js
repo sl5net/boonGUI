@@ -10,6 +10,9 @@ class BoonGUIStatsTopPanel {
 		this.rowsContainer.size = "0 26 100% 100%";
 		this.scales = new BoonGUIColorScales();
 		this.root.sprite = "prettyBackgroundColor";
+		this.TTY = {};
+		this.TTY.POPlast = {"food":0, "wood":0, "stone":0, "metal":0, "foodwood":0.0};
+
 	}
 
 	update(playersStates) {
@@ -35,6 +38,70 @@ class BoonGUIStatsTopPanel {
 				this.scales.addValue(`${resType}Counts`, state.resourceCounts[resType]);
 				this.scales.addValue(`${resType}Gatherers`, state.resourceGatherers[resType]);
 				this.scales.addValue(`${resType}Rates`, state.resourceRates[resType]);
+
+				if( Engine.ConfigDB_GetValue("user", "boongui.hotKeyExplained") == "true") {
+
+					if(state.popCount < 150){
+						let wf = 0;
+						let fw = 0;
+						if(state.resourceCounts['wood'] && state.resourceCounts['food']){
+							wf = Math.round(( state.resourceCounts['wood'] / state.resourceCounts['food'] )*10)/10;
+							fw = Math.round(( state.resourceCounts['food'] / state.resourceCounts['wood'] )*10)/10;
+						}
+						if( wf != this.TTY.POPlast['foodwood']
+							&& ( wf > 1.6 || fw > 1.6 )){ //  1.
+							// warn('wf=' + wf);
+							// warn('fw=' + fw);
+							Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", "food wood is not balanced.", "config/user.cfg");
+							this.TTY.POPlast['foodwood'] = wf;
+						}
+					}
+
+					if( resType == 'food'  
+						&& this.TTY.POPlast[resType] != state.resourceCounts[resType] ){ 			
+							let msg =  '';
+							if(state.resourceCounts[resType] <= 4 * state.popCount)
+								msg = "We are terrible hungry.";
+							else if(state.resourceCounts[resType] <= 7 * state.popCount)
+								msg = "We are hungry.";
+							else if(state.resourceCounts[resType] <= 10 * state.popCount)
+								msg = "Our food supplies are low.";
+							if(msg){
+								Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+								this.TTY.POPlast[resType] = state.resourceCounts[resType];
+							}
+					}else
+					if( resType == 'wood'  
+					&& this.TTY.POPlast[resType] != state.resourceCounts[resType] ){ 			
+						let msg =  '';
+						if(state.resourceCounts[resType] <= 4 * state.popCount)
+							msg =  resType + " is terrible low.";
+						else if(state.resourceCounts[resType] < 7 * state.popCount)
+							msg = "A little more " + resType + " would be good.";
+						else if(state.resourceCounts[resType] <= 10 * state.popCount)
+							msg = "Our " + resType + " supplies are low.";
+						if(msg){
+							Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+							this.TTY.POPlast[resType] = state.resourceCounts[resType];
+							
+						}
+					}else
+					if( resType == 'stone'  
+					&& this.TTY.POPlast[resType] != state.resourceCounts[resType] ){ 			
+						let msg =  '';
+						if(state.resourceCounts[resType] <= 4 * state.popCount)
+							msg = resType + " is terrible low.";
+						else if(state.resourceCounts[resType] < 10 * state.popCount)
+							msg = "A little more " + resType + " would be good.";
+						if(msg){
+							Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+							this.TTY.POPlast[resType] = state.resourceCounts[resType];
+							
+						}
+					}
+
+
+				}
 			}
 		});
 		this.rows.forEach((row, i) => row.update(playersStates[i], this.scales));
