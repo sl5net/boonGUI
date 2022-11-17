@@ -243,6 +243,12 @@
 			},
 			{
 				"type": "boolean",
+				"label": "[color=\"220 185 70\"]TTS tips[/color] population Speech tips to you (EXPERIMENTAL)",
+				"tooltip": "population gives you tips (Speech to you)  ",
+				"config": "boongui.TTStipsFromPopulation"
+			},
+			{
+				"type": "boolean",
 				"label": "[color=\"220 185 70\"]tips[/color]itsWorldCup(EXPERIMENTAL)",
 				"tooltip": "itsWorldCup welcome message and greeting voice",
 				"config": "boongui.itsWorldCup"

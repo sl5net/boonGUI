@@ -39,7 +39,7 @@ class BoonGUIStatsTopPanel {
 				this.scales.addValue(`${resType}Gatherers`, state.resourceGatherers[resType]);
 				this.scales.addValue(`${resType}Rates`, state.resourceRates[resType]);
 
-				if( Engine.ConfigDB_GetValue("user", "boongui.hotKeyExplained") == "true") {
+				if( Engine.ConfigDB_GetValue("user", "boongui.TTStipsFromPopulation") == "true") {
 
 					if(state.popCount < 150){
 						let wf = 0;
@@ -48,12 +48,20 @@ class BoonGUIStatsTopPanel {
 							wf = Math.round(( state.resourceCounts['wood'] / state.resourceCounts['food'] )*10)/10;
 							fw = Math.round(( state.resourceCounts['food'] / state.resourceCounts['wood'] )*10)/10;
 						}
-						if( wf != this.TTY.POPlast['foodwood']
-							&& ( wf > 1.6 || fw > 1.6 )){ //  1.
+						if( wf != this.TTY.POPlast['foodwood'] ){
+							// && ( wf > 1.6 || fw > 1.6 )){ //  1.
 							// warn('wf=' + wf);
 							// warn('fw=' + fw);
-							Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", "food wood is not balanced.", "config/user.cfg");
-							this.TTY.POPlast['foodwood'] = wf;
+							let msg = '';
+							if ( wf > 1.6 )
+								msg = "Not balanced. More food please.", "config/user.cfg";
+							else if ( fw > 1.6 )
+								msg = "Not balanced. More wood please.", "config/user.cfg";
+
+							if(msg){
+								Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+								this.TTY.POPlast['foodwood'] = wf;
+							}
 						}
 					}
 
