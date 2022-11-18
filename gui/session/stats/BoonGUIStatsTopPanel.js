@@ -53,10 +53,10 @@ class BoonGUIStatsTopPanel {
 							// warn('wf=' + wf);
 							// warn('fw=' + fw);
 							let msg = '';
-							if ( wf > 1.6 )
-								msg = "Not balanced. More food please.", "config/user.cfg";
-							else if ( fw > 1.6 )
-								msg = "Not balanced. More wood please.", "config/user.cfg";
+							if ( wf > 1.8 )
+								msg = "Not balanced. More food to eat please.", "config/user.cfg";
+							else if ( fw > 1.8 )
+								msg = "Not balanced. More wood please. fell trees", "config/user.cfg";
 
 							if(msg){
 								ttsPL(msg);
