@@ -528,7 +528,8 @@ class BoonGUIStatsTopPanelRow
 				 && this.hotKeyExplained_atPopCount != this.statPopCount
 				 && Engine.ConfigDB_GetValue("user", "boongui.hotKeyExplained") == "true"){
 				let msg = this.hotKeyExplainedTipsList.shift();
-				Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+				// Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+				ttsPL(msg);
 				this.hotKeyExplained_atPopCount = this.statPopCount;
 				this.hotKeyExplained++; // just for statisic or so
 				warn(this.hotKeyExplained);
@@ -541,7 +542,7 @@ class BoonGUIStatsTopPanelRow
 
 				const msg = "0AD 1v1 Tournament Oktober 2022. Seeh versus Wave-A-Book .";
 
-				Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+				ttsPL(msg);
 
 
 				// ANCHOR - Tournament: PhiliptheSwaggerless \n vs \nEdwarf
@@ -657,9 +658,11 @@ class BoonGUIStatsTopPanelRow
 				let yawningAudioFile = Engine.ConfigDB_GetValue("user", "boongui.yawningAudioFile");
 				if (true || yawningAudioFile == "TTS"){
 					if(idleCount == 1)
-						Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", idleCount + " is waiting", "config/user.cfg");
+						// Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", idleCount + " is waiting", "config/user.cfg");
+						ttsPL(idleCount + " is waiting");
 					else
-						Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", idleCount + " are waiting", "config/user.cfg");
+						// Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", idleCount + " are waiting", "config/user.cfg");
+						ttsPL(idleCount + " are waiting");
 				}else{
 					if (idleCount > 1)
 						if (idleCount > 9 && yawningAudioFile == "we-did-it-yeah.ogg"){

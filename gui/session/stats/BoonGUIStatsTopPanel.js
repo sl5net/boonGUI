@@ -59,7 +59,7 @@ class BoonGUIStatsTopPanel {
 								msg = "Not balanced. More wood please.", "config/user.cfg";
 
 							if(msg){
-								Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+								ttsPL(msg);
 								this.TTY.POPlast['foodwood'] = wf;
 							}
 						}
@@ -75,7 +75,7 @@ class BoonGUIStatsTopPanel {
 							else if(state.resourceCounts[resType] <= 10 * state.popCount)
 								msg = "Our food supplies are low.";
 							if(msg){
-								Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+								ttsPL(msg);
 								this.TTY.POPlast[resType] = state.resourceCounts[resType];
 							}
 					}else
@@ -89,7 +89,7 @@ class BoonGUIStatsTopPanel {
 						else if(state.resourceCounts[resType] <= 10 * state.popCount)
 							msg = "Our " + resType + " supplies are low.";
 						if(msg){
-							Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+							ttsPL(msg);
 							this.TTY.POPlast[resType] = state.resourceCounts[resType];
 							
 						}
@@ -102,7 +102,7 @@ class BoonGUIStatsTopPanel {
 						else if(state.resourceCounts[resType] < 10 * state.popCount)
 							msg = "A little more " + resType + " would be good.";
 						if(msg){
-							Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+							ttsPL(msg);
 							this.TTY.POPlast[resType] = state.resourceCounts[resType];
 							
 						}
@@ -115,3 +115,10 @@ class BoonGUIStatsTopPanel {
 		this.rows.forEach((row, i) => row.update(playersStates[i], this.scales));
 	}
 }
+function ttsPL(msg){
+	Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.speak", msg, "config/user.cfg");
+	const date = new Date();
+	const isoDateTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+	Engine.ConfigDB_WriteValueToFile("user", "AudioTTS.timestamp","" + isoDateTime, "config/user.cfg");
+}
+
